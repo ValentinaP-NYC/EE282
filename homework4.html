@@ -395,23 +395,29 @@ bioawk -c fastx &#39;{ print $name, length($seq), gc($seq) }&#39; filtered_100kb
 <pre class="r"><code>library(ggplot2)
 
 # Load sequence length data for sequences ≤ 100kb
-sequence_lengths_100kb &lt;- scan(&quot;sequence_lengths_100kb.txt&quot;)
+sequence_lengths_100kb&lt;- read.table(&quot;sorted_lengths_100kb.txt&quot;, header = FALSE, sep = &quot;\t&quot;)
+
+# Add column names manually
+colnames(sequence_lengths_100kb) &lt;- c(&quot;Sequence_Name&quot;, &quot;Length&quot;, &quot;GC_Content&quot;)
 
 # Plot histogram for Sequence Length Distribution (≤ 100kb) using ggplot2 with log scale
-ggplot(data = data.frame(sequence_lengths_100kb), aes(x = sequence_lengths_100kb)) +
-  geom_histogram(bins = 30, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+ggplot(data = sequence_lengths_100kb, aes(x = Length)) +
+  geom_histogram(bins = 30, color = &quot;black&quot;, fill = &quot;pink&quot;) +
   scale_x_log10() +  # Set x-axis to log scale
-  labs(title = &quot;Sequence Length Distribution (≤ 100kb)&quot;, x = &quot;Sequence Length (log scale)&quot;, y = &quot;Frequency&quot;) +
+  labs(title = &quot;Sequence Length Distribution (≤ 100kb)&quot;, x = &quot;Length(log scale)&quot;, y = &quot;Frequency&quot;) +
   theme_minimal()
 
 # Load sequence length data for sequences &gt; 100kb
-sequence_lengths_100kb_plus &lt;- scan(&quot;sequence_lengths_100kb_plus.txt&quot;)
+sequence_lengths_100kb_plus&lt;- read.table(&quot;sorted_lengths_100kb_plus.txt&quot;, header = FALSE, sep = &quot;\t&quot;)
 
-# Plot histogram for Sequence Length Distribution (&gt; 100kb) using ggplot2 with log scale
-ggplot(data = data.frame(sequence_lengths_100kb_plus), aes(x = sequence_lengths_100kb_plus)) +
-  geom_histogram(bins = 30, fill = &quot;salmon&quot;, color = &quot;black&quot;) +
+# Add column names manually
+colnames(sequence_lengths_100kb_plus) &lt;- c(&quot;Sequence_Name&quot;, &quot;Length&quot;, &quot;GC_Content&quot;)
+
+# Plot histogram for Sequence Length Distribution (≤ 100kb) using ggplot2 with log scale
+ggplot(data = sequence_lengths_100kb_plus, aes(x = Length)) +
+  geom_histogram(bins = 30, fill = &quot;dark green&quot;,color = &quot;black&quot;) +
   scale_x_log10() +  # Set x-axis to log scale
-  labs(title = &quot;Sequence Length Distribution (&gt; 100kb)&quot;, x = &quot;Sequence Length (log scale)&quot;, y = &quot;Frequency&quot;) +
+  labs(title = &quot;Sequence Length Distribution (&gt;100kb)&quot;, x = &quot;Length(log scale)&quot;, y = &quot;Frequency&quot;) +
   theme_minimal()
 </code></pre>
 <pre class="bash"><code># plot cumulative sequence size sorted from largest to smallest sequences
@@ -423,36 +429,18 @@ plotCDF sorted_lengths_100kb_plus.txt  &gt; cdf_100kb_plus.png
 </div>
 <div id="plot-gc-content" class="section level2">
 <h2>plot gc content</h2>
-<p>bioawk -c fastx ‘{ print gc($seq) }’ filtered_100kb.fa &gt;
-gc_100kb.txt</p>
-<p>bioawk -c fastx ‘{ print gc($seq) }’ filtered_100kb_plus.fa &gt;
-gc_100kb_plus.txt</p>
 <pre class="r"><code>
-library(ggplot2)
-
-# Load GC% data for sequences ≤ 100kb
-gc_100kb &lt;- scan(&quot;gc_100kb.txt&quot;)
-
 # Plot histogram for GC% Distribution (≤ 100kb) using ggplot2
-ggplot(data = data.frame(gc_100kb), aes(x = gc_100kb)) +
-  geom_histogram(bins = 30, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
-  labs(title = &quot;GC% Distribution (≤ 100kb)&quot;, x = &quot;GC%&quot;, y = &quot;Frequency&quot;) +
+ggplot(data = sequence_lengths_100kb, aes(x = GC_Content)) +
+  geom_histogram(bins = 30, color = &quot;black&quot;, fill = &quot;pink&quot;) +
+  labs(title = &quot;GC Content Distribution (≤ 100kb)&quot;, x = &quot;GC_Content&quot;, y = &quot;Frequency&quot;) +
   theme_minimal()
-
-# Save the histogram for GC% Distribution (≤ 100kb) as a PNG
-ggsave(&quot;gc_100kb_histogram.png&quot;, width = 8, height = 6)
-
-# Load GC% data for sequences &gt; 100kb
-gc_100kb_plus &lt;- scan(&quot;gc_100kb_plus.txt&quot;)
 
 # Plot histogram for GC% Distribution (&gt; 100kb) using ggplot2
-ggplot(data = data.frame(gc_100kb_plus), aes(x = gc_100kb_plus)) +
-  geom_histogram(bins = 30, fill = &quot;salmon&quot;, color = &quot;black&quot;) +
-  labs(title = &quot;GC% Distribution (&gt; 100kb)&quot;, x = &quot;GC%&quot;, y = &quot;Frequency&quot;) +
+ggplot(data = sequence_lengths_100kb_plus, aes(x = GC_Content)) +
+  geom_histogram(bins = 30, fill = &quot;dark green&quot;,color = &quot;black&quot;) +
+  labs(title = &quot;GC Content Distribution (&gt;100kb)&quot;, x = &quot;GC_content&quot;, y = &quot;Frequency&quot;) +
   theme_minimal()
-
-# Save the histogram for GC% Distribution (&gt; 100kb) as a PNG
-ggsave(&quot;gc_100kb_plus_histogram.png&quot;, width = 8, height = 6)
 </code></pre>
 </div>
 </div>

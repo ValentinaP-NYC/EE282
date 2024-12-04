@@ -99,6 +99,16 @@ ggplot(data = sequence_lengths_100kb_plus, aes(x = GC_Content)) +
   labs(title = "GC Content Distribution (>100kb)", x = "GC_content", y = "Frequency") +
   theme_minimal()
 
+
+
+# Plot CDF
+
+max_100kb <- ecdf(sequence_lengths_100kb$Length) 
+plot(max_100kb)
+
+plus_100kb <- ecdf(sequence_lengths_100kb_plus$Length)
+plot(plus_100kb)
+
 ```
 
 
