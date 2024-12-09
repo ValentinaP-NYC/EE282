@@ -1,10 +1,10 @@
-# Homework 4 for EE282 
+# Homework 4 for EE282
 
 Author: Valentina Peña
 
-## Calculate summaries of the genome
+## Calculate summaries of the genome for partitons
 
-```bash
+``` bash
 cd ~/myrepos/ee282/data/raw
 
 # Download chromosome data 
@@ -16,12 +16,12 @@ wget "https://ftp.flybase.net/releases/current/dmel_r6.60/fasta/md5sum.txt"
 md5sum -c md5sum.txt # returns OK
 ```
 
-```bash
+``` bash
 # Generate reports for genome partitions 
 
-## Sequnces less than 100kb
+## Sequnces less than 100kb using scaffold file
 faFilter -maxSize=100000 <(gunzip -c dmel-all-chromosome-r6.48.fasta.gz) filtered_100kb.fasta
- 
+
 faSize -tab filtered_100kb.fasta > filtered_100kb_fa_size_output.txt
 
 less filtered_100kb_fa_size_output.txt
@@ -33,17 +33,18 @@ faSize -tab filtered_100kb_plus.fasta > filtered_100kb_plus_fa_size_output.txt
 
 less filtered_100kb_plus_fa_size_output.txt
 ```
+
 # Generate plots for genome partititons
+
 ## plot sequence length
 
-```bash
-
+``` bash
 bioawk -c fastx '{ print $name, length($seq), gc($seq) }' filtered_100kb.fasta | sort -k2,2nr > sorted_lengths_100kb.txt
 
 bioawk -c fastx '{ print $name, length($seq), gc($seq) }' filtered_100kb_plus.fasta | sort -k2,2nr > sorted_lengths_100kb_plus.txt
-
 ```
-```r
+
+``` r
 library(ggplot2)
 
 # Load sequence length data for sequences ≤ 100kb
@@ -71,21 +72,11 @@ ggplot(data = sequence_lengths_100kb_plus, aes(x = Length)) +
   scale_x_log10() +  # Set x-axis to log scale
   labs(title = "Sequence Length Distribution (>100kb)", x = "Length(log scale)", y = "Frequency") +
   theme_minimal()
-
-```
-
-```bash
-# plot cumulative sequence size sorted from largest to smallest sequences
-
-plotCDF sorted_lengths_100kb.txt > cdf_100kb.png
-
-plotCDF sorted_lengths_100kb_plus.txt  > cdf_100kb_plus.png
-
 ```
 
 ## plot gc content
 
-```r
+``` r
 
 # Plot histogram for GC% Distribution (≤ 100kb) using ggplot2
 ggplot(data = sequence_lengths_100kb, aes(x = GC_Content)) +
@@ -98,17 +89,157 @@ ggplot(data = sequence_lengths_100kb_plus, aes(x = GC_Content)) +
   geom_histogram(bins = 30, fill = "dark green",color = "black") +
   labs(title = "GC Content Distribution (>100kb)", x = "GC_content", y = "Frequency") +
   theme_minimal()
+```
+
+``` bash
+# plot cumulative sequence size sorted from largest to smallest sequences
+cut -f2 sorted_lengths_100kb.txt > sorted_lengths_copy_100kb.txt
+plotCDF sorted_lengths_copy_100kb.txt cdf_100kb.png
+
+cut -f2 sorted_lengths_100kb_plus.txt > sorted_lengths_copy_100kb_plus.txt
+plotCDF sorted_lengths_copy_100kb_plus.txt cdf_100kb_plus.png
+```
+
+``` bash
+# use faSize to calculate lengths for ISO1 hifi contig 
+
+faSize -detailed /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa > /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes.txt
+
+# sort lengths
+
+sort -rnk 2,2 /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes.txt > /data/homezvol2/valenp1/myrepos/ee282/data/processed/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes_sorted.txt
+
+# calculate the n50
+
+awk '{
+    sum_length += $2;          # Sum the lengths in column 2
+    sizes[NR] = $2;       # Store the lengths
+}
+END {
+    half = sum_length / 2;     # Calculate half of the total length
+    for (i = 1; i <= NR; i++) {
+        sum += sizes[i];  # Accumulate lengths
+        if (sum >= half) {
+            print "N50:", sizes[i]; # Print N50 when cumulative sum reaches half
+            break;
+        }
+    }
+}' /data/homezvol2/valenp1/myrepos/ee282/data/processed/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes_sorted.txt
+
+# the answer N50: 21715751
+# 21.72 Mb
+```
+``` bash
+# for the ref dmel on flyable
+# use faSize to calculate lengths
+
+# Release 6 contigs
+
+faSplitByN /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa
+
+gzip /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa
+
+faSize -detailed /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa.gz > /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes.txt
+
+# sort lengths
+
+sort -rnk 2,2 /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes.txt > /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes_sorted.txt
 
 
+# the dmel-all
 
-# Plot CDF
+awk '{
+    sum_length += $2;          # Sum the lengths in column 2
+    sizes[NR] = $2;       # Store the lengths
+}
+END {
+    half = sum_length / 2;     # Calculate half of the total length
+    for (i = 1; i <= NR; i++) {
+        sum += sizes[i];  # Accumulate lengths
+        if (sum >= half) {
+            print "N50:", sizes[i]; # Print N50 when cumulative sum reaches half
+            break;
+        }
+    }
+}' /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes_sorted.txt
 
-max_100kb <- ecdf(sequence_lengths_100kb$Length) 
-plot(max_100kb)
+# the answer N50: 21485538
+# 21.5 Mb
 
-plus_100kb <- ecdf(sequence_lengths_100kb_plus$Length)
-plot(plus_100kb)
+# 21.5 Mb is the contiguous n50 listed on flybase for r6 via the link available
+```
+
+``` bash
+# Release 6 scaffolds
+
+faSize -detailed dmel-all-chromosome-r6.48.fasta.gz > dmel-all-chromosome-r6.48.unsorted.namesizes.txt
+
+sort -rnk 2,2 dmel-all-chromosome-r6.48.unsorted.namesizes.txt > dmel-all-chromosome-r6.48.scaff_sizes_sorted.txt
+
+cut -f2 dmel-all-chromosome-r6.48.scaff_sizes_sorted.txt > dmel-all-chromosome-r6.48.scaffp_sizes_sorted.txt
+
+# Plot CDF for ISO1 Hifi .ctg / dmel-r6.ctg / dmel-r6.scaff
+plotCDF ./*_copy.txt CDF.png
 
 ```
 
+``` bash
+# run hifiasm, the sbatch script can be found at ee282/code/scripts
+
+hifiasm -o /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm \
+ -t 32 /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.fasta.gz
+
+# convert gfa for fasta for */bp.p_ctg.gfa
+
+awk '/^S/{print ">"$2;print $3}' /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.gfa > /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa
+
+```
+``` bash
+# run busco, the sbatch script can be found at ee282/code/scripts
+busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa -o ISO1_Hifiasm --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/busco
+
+```
+# BUSCO Results Summary
+### Overview
+
+| Statistic                     | Value          |
+|-------------------------------|----------------|
+| **BUSCO version**             | 5.8.1          |
+| **Lineage dataset**           | diptera_odb10  |
+| **Number of BUSCOs searched** | 3285           |
+| **Gene predictor used**       | miniprot       |
+| **Mode**                      | euk_genome_min |
+| **Percent complete (C)**      | 99.6%          |
+| **Percent single-copy (S)**   | 99.4%          |
+| **Percent duplicated (D)**    | 0.2%           |
+| **Percent fragmented (F)**    | 0.2%           |
+| **Percent missing (M)**       | 0.2%           |
+| **Errors**                    | 2.0%           |
+
+### BUSCO Breakdown
+
+| Category                                | Count | Details                                  |
+|------------------------------|---------------|----------------------------|
+| **Complete BUSCOs (C)**                 | 3272  | Of which 66 contain internal stop codons |
+| **Complete and single-copy BUSCOs (S)** | 3265  |                                          |
+| **Complete and duplicated BUSCOs (D)**  | 7     |                                          |
+| **Fragmented BUSCOs (F)**               | 5     |                                          |
+| **Missing BUSCOs (M)**                  | 8     |                                          |
+
+### Assembly Statistics
+
+| Statistic               | Value       |
+|-------------------------|-------------|
+| **Number of scaffolds** | 148         |
+| **Number of contigs**   | 148         |
+| **Total length**        | 159,127,788 |
+| **Percent gaps**        | 0.000%      |
+| **Scaffold N50**        | 21 MB       |
+| **Contig N50**          | 21 MB       |
+
+### Dependencies and Versions
+
+| Dependency    | Version |
+|---------------|---------|
+| **hmmsearch** | 3.4     |
 

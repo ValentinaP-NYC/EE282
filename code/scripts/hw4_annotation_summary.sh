@@ -44,7 +44,7 @@ faSize -detailed /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_Adapto
 sort -rnk 2,2 /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes.txt > /data/homezvol2/valenp1/myrepos/ee282/data/processed/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes_sorted.txt
 
 
-#
+# calculate the n50
 
 awk '{
     sum_length += $2;          # Sum the lengths in column 2
@@ -65,18 +65,21 @@ END {
 # the answer N50: 21715751
 # 21.72 Mb
 
-# 21.5 Mb is the contiguous n50 listed on flybase for 
-
-
 # for the ref duel on flyable
 
 # use faSize to calculate lengths
 
-faSize -detailed /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz > /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz.contig_sizes.txt
+# Release 6 contigs
+
+faSplitByN /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa
+
+gzip /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa
+
+faSize -detailed /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa.gz > /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes.txt
 
 # sort lengths
 
-sort -rnk 2,2 /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz.contig_sizes.txt > /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz.contig_sorted_sizes.txt
+sort -rnk 2,2 /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes.txt > /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes_sorted.txt
 
 
 # the dmel-all
@@ -94,8 +97,14 @@ END {
             break;
         }
     }
-}' /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz.contig_sizes.txt
+}' /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes_sorted.txt
 
-# the answer N50: 28110227
-# 28.11 Mb
+# the answer N50: 21485538
+# 21.5 Mb
+
+# ayee, 21.5 Mb is the contiguous n50 listed on flybase for r6 via the link available
+
+
+
+
 

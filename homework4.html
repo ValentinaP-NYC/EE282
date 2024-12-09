@@ -355,8 +355,8 @@ display: none;
 <div id="homework-4-for-ee282" class="section level1">
 <h1>Homework 4 for EE282</h1>
 <p>Author: Valentina Peña</p>
-<div id="calculate-summaries-of-the-genome" class="section level2">
-<h2>Calculate summaries of the genome</h2>
+<div id="calculate-summaries-of-the-genome-for-partitons" class="section level2">
+<h2>Calculate summaries of the genome for partitons</h2>
 <pre class="bash"><code>cd ~/myrepos/ee282/data/raw
 
 # Download chromosome data 
@@ -368,9 +368,9 @@ wget &quot;https://ftp.flybase.net/releases/current/dmel_r6.60/fasta/md5sum.txt&
 md5sum -c md5sum.txt # returns OK</code></pre>
 <pre class="bash"><code># Generate reports for genome partitions 
 
-## Sequnces less than 100kb
+## Sequnces less than 100kb using scaffold file
 faFilter -maxSize=100000 &lt;(gunzip -c dmel-all-chromosome-r6.48.fasta.gz) filtered_100kb.fasta
- 
+
 faSize -tab filtered_100kb.fasta &gt; filtered_100kb_fa_size_output.txt
 
 less filtered_100kb_fa_size_output.txt
@@ -387,11 +387,9 @@ less filtered_100kb_plus_fa_size_output.txt</code></pre>
 <h1>Generate plots for genome partititons</h1>
 <div id="plot-sequence-length" class="section level2">
 <h2>plot sequence length</h2>
-<pre class="bash"><code>
-bioawk -c fastx &#39;{ print $name, length($seq), gc($seq) }&#39; filtered_100kb.fasta | sort -k2,2nr &gt; sorted_lengths_100kb.txt
+<pre class="bash"><code>bioawk -c fastx &#39;{ print $name, length($seq), gc($seq) }&#39; filtered_100kb.fasta | sort -k2,2nr &gt; sorted_lengths_100kb.txt
 
-bioawk -c fastx &#39;{ print $name, length($seq), gc($seq) }&#39; filtered_100kb_plus.fasta | sort -k2,2nr &gt; sorted_lengths_100kb_plus.txt
-</code></pre>
+bioawk -c fastx &#39;{ print $name, length($seq), gc($seq) }&#39; filtered_100kb_plus.fasta | sort -k2,2nr &gt; sorted_lengths_100kb_plus.txt</code></pre>
 <pre class="r"><code>library(ggplot2)
 
 # Load sequence length data for sequences ≤ 100kb
@@ -418,14 +416,7 @@ ggplot(data = sequence_lengths_100kb_plus, aes(x = Length)) +
   geom_histogram(bins = 30, fill = &quot;dark green&quot;,color = &quot;black&quot;) +
   scale_x_log10() +  # Set x-axis to log scale
   labs(title = &quot;Sequence Length Distribution (&gt;100kb)&quot;, x = &quot;Length(log scale)&quot;, y = &quot;Frequency&quot;) +
-  theme_minimal()
-</code></pre>
-<pre class="bash"><code># plot cumulative sequence size sorted from largest to smallest sequences
-
-plotCDF sorted_lengths_100kb.txt &gt; cdf_100kb.png
-
-plotCDF sorted_lengths_100kb_plus.txt  &gt; cdf_100kb_plus.png
-</code></pre>
+  theme_minimal()</code></pre>
 </div>
 <div id="plot-gc-content" class="section level2">
 <h2>plot gc content</h2>
@@ -440,8 +431,259 @@ ggplot(data = sequence_lengths_100kb, aes(x = GC_Content)) +
 ggplot(data = sequence_lengths_100kb_plus, aes(x = GC_Content)) +
   geom_histogram(bins = 30, fill = &quot;dark green&quot;,color = &quot;black&quot;) +
   labs(title = &quot;GC Content Distribution (&gt;100kb)&quot;, x = &quot;GC_content&quot;, y = &quot;Frequency&quot;) +
-  theme_minimal()
+  theme_minimal()</code></pre>
+<pre class="bash"><code># plot cumulative sequence size sorted from largest to smallest sequences
+cut -f2 sorted_lengths_100kb.txt &gt; sorted_lengths_copy_100kb.txt
+plotCDF sorted_lengths_copy_100kb.txt cdf_100kb.png
+
+cut -f2 sorted_lengths_100kb_plus.txt &gt; sorted_lengths_copy_100kb_plus.txt
+plotCDF sorted_lengths_copy_100kb_plus.txt cdf_100kb_plus.png</code></pre>
+<pre class="bash"><code># use faSize to calculate lengths for ISO1 hifi contig 
+
+faSize -detailed /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa &gt; /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes.txt
+
+# sort lengths
+
+sort -rnk 2,2 /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes.txt &gt; /data/homezvol2/valenp1/myrepos/ee282/data/processed/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes_sorted.txt
+
+# calculate the n50
+
+awk &#39;{
+    sum_length += $2;          # Sum the lengths in column 2
+    sizes[NR] = $2;       # Store the lengths
+}
+END {
+    half = sum_length / 2;     # Calculate half of the total length
+    for (i = 1; i &lt;= NR; i++) {
+        sum += sizes[i];  # Accumulate lengths
+        if (sum &gt;= half) {
+            print &quot;N50:&quot;, sizes[i]; # Print N50 when cumulative sum reaches half
+            break;
+        }
+    }
+}&#39; /data/homezvol2/valenp1/myrepos/ee282/data/processed/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa.contig_sizes_sorted.txt
+
+# the answer N50: 21715751
+# 21.72 Mb</code></pre>
+<pre class="bash"><code># for the ref dmel on flyable
+# use faSize to calculate lengths
+
+# Release 6 contigs
+
+faSplitByN /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.fasta.gz /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa
+
+gzip /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa
+
+faSize -detailed /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa.gz &gt; /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes.txt
+
+# sort lengths
+
+sort -rnk 2,2 /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes.txt &gt; /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes_sorted.txt
+
+
+# the dmel-all
+
+awk &#39;{
+    sum_length += $2;          # Sum the lengths in column 2
+    sizes[NR] = $2;       # Store the lengths
+}
+END {
+    half = sum_length / 2;     # Calculate half of the total length
+    for (i = 1; i &lt;= NR; i++) {
+        sum += sizes[i];  # Accumulate lengths
+        if (sum &gt;= half) {
+            print &quot;N50:&quot;, sizes[i]; # Print N50 when cumulative sum reaches half
+            break;
+        }
+    }
+}&#39; /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.contig_sizes_sorted.txt
+
+# the answer N50: 21485538
+# 21.5 Mb
+
+# 21.5 Mb is the contiguous n50 listed on flybase for r6 via the link available</code></pre>
+<pre class="bash"><code># Release 6 scaffolds
+
+faSize -detailed dmel-all-chromosome-r6.48.fasta.gz &gt; dmel-all-chromosome-r6.48.unsorted.namesizes.txt
+
+sort -rnk 2,2 dmel-all-chromosome-r6.48.unsorted.namesizes.txt &gt; dmel-all-chromosome-r6.48.scaff_sizes_sorted.txt
+
+cut -f2 dmel-all-chromosome-r6.48.scaff_sizes_sorted.txt &gt; dmel-all-chromosome-r6.48.scaffp_sizes_sorted.txt
+
+# Plot CDF for ISO1 Hifi .ctg / dmel-r6.ctg / dmel-r6.scaff
+plotCDF ./*_copy.txt CDF.png
 </code></pre>
+<pre class="bash"><code># run hifiasm, the sbatch script can be found at ee282/code/scripts
+
+hifiasm -o /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm \
+ -t 32 /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.fasta.gz
+
+# convert gfa for fasta for */bp.p_ctg.gfa
+
+awk &#39;/^S/{print &quot;&gt;&quot;$2;print $3}&#39; /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.gfa &gt; /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa
+</code></pre>
+<pre class="bash"><code># run busco, the sbatch script can be found at ee282/code/scripts
+
+busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa -o ISO1_Hifiasm --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/busco
+</code></pre>
+</div>
+</div>
+<div id="busco-results-summary" class="section level1">
+<h1>BUSCO Results Summary</h1>
+<div id="overview" class="section level3">
+<h3>Overview</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Statistic</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>BUSCO version</strong></td>
+<td>5.8.1</td>
+</tr>
+<tr class="even">
+<td><strong>Lineage dataset</strong></td>
+<td>diptera_odb10</td>
+</tr>
+<tr class="odd">
+<td><strong>Number of BUSCOs searched</strong></td>
+<td>3285</td>
+</tr>
+<tr class="even">
+<td><strong>Gene predictor used</strong></td>
+<td>miniprot</td>
+</tr>
+<tr class="odd">
+<td><strong>Mode</strong></td>
+<td>euk_genome_min</td>
+</tr>
+<tr class="even">
+<td><strong>Percent complete (C)</strong></td>
+<td>99.6%</td>
+</tr>
+<tr class="odd">
+<td><strong>Percent single-copy (S)</strong></td>
+<td>99.4%</td>
+</tr>
+<tr class="even">
+<td><strong>Percent duplicated (D)</strong></td>
+<td>0.2%</td>
+</tr>
+<tr class="odd">
+<td><strong>Percent fragmented (F)</strong></td>
+<td>0.2%</td>
+</tr>
+<tr class="even">
+<td><strong>Percent missing (M)</strong></td>
+<td>0.2%</td>
+</tr>
+<tr class="odd">
+<td><strong>Errors</strong></td>
+<td>2.0%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="busco-breakdown" class="section level3">
+<h3>BUSCO Breakdown</h3>
+<table>
+<colgroup>
+<col width="41%" />
+<col width="20%" />
+<col width="38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Count</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Complete BUSCOs (C)</strong></td>
+<td>3272</td>
+<td>Of which 66 contain internal stop codons</td>
+</tr>
+<tr class="even">
+<td><strong>Complete and single-copy BUSCOs (S)</strong></td>
+<td>3265</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>Complete and duplicated BUSCOs (D)</strong></td>
+<td>7</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>Fragmented BUSCOs (F)</strong></td>
+<td>5</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>Missing BUSCOs (M)</strong></td>
+<td>8</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="assembly-statistics" class="section level3">
+<h3>Assembly Statistics</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Statistic</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Number of scaffolds</strong></td>
+<td>148</td>
+</tr>
+<tr class="even">
+<td><strong>Number of contigs</strong></td>
+<td>148</td>
+</tr>
+<tr class="odd">
+<td><strong>Total length</strong></td>
+<td>159,127,788</td>
+</tr>
+<tr class="even">
+<td><strong>Percent gaps</strong></td>
+<td>0.000%</td>
+</tr>
+<tr class="odd">
+<td><strong>Scaffold N50</strong></td>
+<td>21 MB</td>
+</tr>
+<tr class="even">
+<td><strong>Contig N50</strong></td>
+<td>21 MB</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dependencies-and-versions" class="section level3">
+<h3>Dependencies and Versions</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Dependency</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>hmmsearch</strong></td>
+<td>3.4</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
