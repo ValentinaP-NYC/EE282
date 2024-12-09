@@ -48,6 +48,8 @@ bioawk -c fastx '{ print $name, length($seq), gc($seq) }' filtered_100kb_plus.fa
 library(ggplot2)
 
 # Load sequence length data for sequences ≤ 100kb
+setwd("~/remote_mount/myrepos/ee282/data/raw")
+
 sequence_lengths_100kb<- read.table("sorted_lengths_100kb.txt", header = FALSE, sep = "\t")
 
 # Add column names manually
@@ -95,6 +97,7 @@ ggplot(data = sequence_lengths_100kb_plus, aes(x = GC_Content)) +
 # plot cumulative sequence size sorted from largest to smallest sequences
 cut -f2 sorted_lengths_100kb.txt > sorted_lengths_copy_100kb.txt
 plotCDF sorted_lengths_copy_100kb.txt cdf_100kb.png
+![Cumulative Distribution Function](https://raw.githubusercontent.com/ValentinaP-NYC/ee282/homework4/cdf_100kb.png)
 
 cut -f2 sorted_lengths_100kb_plus.txt > sorted_lengths_copy_100kb_plus.txt
 plotCDF sorted_lengths_copy_100kb_plus.txt cdf_100kb_plus.png
@@ -194,52 +197,47 @@ hifiasm -o /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.4
 awk '/^S/{print ">"$2;print $3}' /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.gfa > /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa
 
 ```
+# BUSCO Results Summary for ISO1
 ``` bash
 # run busco, the sbatch script can be found at ee282/code/scripts
 busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa -o ISO1_Hifiasm --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/busco
-
 ```
-# BUSCO Results Summary
-### Overview
 
-| Statistic                     | Value          |
-|-------------------------------|----------------|
-| **BUSCO version**             | 5.8.1          |
-| **Lineage dataset**           | diptera_odb10  |
-| **Number of BUSCOs searched** | 3285           |
-| **Gene predictor used**       | miniprot       |
-| **Mode**                      | euk_genome_min |
-| **Percent complete (C)**      | 99.6%          |
-| **Percent single-copy (S)**   | 99.4%          |
-| **Percent duplicated (D)**    | 0.2%           |
-| **Percent fragmented (F)**    | 0.2%           |
-| **Percent missing (M)**       | 0.2%           |
-| **Errors**                    | 2.0%           |
+| **Category**               | **Metric**                           | **Value**                   |
+|----------------------------|---------------------------------------|-----------------------------|
+| **Results Summary**        | Complete BUSCOs (C)                  | 3272 (99.6%)               |
+|                            | ├── Single-copy BUSCOs (S)           | 3265 (99.4%)               |
+|                            | └── Duplicated BUSCOs (D)            | 7 (0.2%)                   |
+|                            | Fragmented BUSCOs (F)                | 5 (0.2%)                   |
+|                            | Missing BUSCOs (M)                   | 8 (0.2%)                   |
+|                            | Total BUSCO groups searched (n)      | 3285                       |
+|                            | BUSCO groups with internal stops     | 66                         |
+| **Assembly Statistics**    | Number of scaffolds                  | 148                        |
+|                            | Number of contigs                    | 148                        |
+|                            | Total length                         | 159,127,788 bp             |
+|                            | Percent gaps                         | 0.000%                     |
+|                            | Scaffold N50                         | 21 MB                      |
+|                            | Contigs N50                          | 21 MB                      |
 
-### BUSCO Breakdown
 
-| Category                                | Count | Details                                  |
-|------------------------------|---------------|----------------------------|
-| **Complete BUSCOs (C)**                 | 3272  | Of which 66 contain internal stop codons |
-| **Complete and single-copy BUSCOs (S)** | 3265  |                                          |
-| **Complete and duplicated BUSCOs (D)**  | 7     |                                          |
-| **Fragmented BUSCOs (F)**               | 5     |                                          |
-| **Missing BUSCOs (M)**                  | 8     |                                          |
-
-### Assembly Statistics
-
-| Statistic               | Value       |
-|-------------------------|-------------|
-| **Number of scaffolds** | 148         |
-| **Number of contigs**   | 148         |
-| **Total length**        | 159,127,788 |
-| **Percent gaps**        | 0.000%      |
-| **Scaffold N50**        | 21 MB       |
-| **Contig N50**          | 21 MB       |
-
-### Dependencies and Versions
-
-| Dependency    | Version |
-|---------------|---------|
-| **hmmsearch** | 3.4     |
+# BUSCO Results Summary for Release 6 Dmel contig
+``` bash
+# run busco, the sbatch script can be found at ee282/code/scripts
+busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa -o dmel.r6_ctg --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/hmw4_busco
+```
+| **Category**               | **Metric**                           | **Value**                   |
+|----------------------------|---------------------------------------|-----------------------------|
+| **Results Summary**        | Complete BUSCOs (C)                  | 3276 (99.7%)               |
+|                            | ├── Single-copy BUSCOs (S)           | 3267 (99.5%)               |
+|                            | └── Duplicated BUSCOs (D)            | 9 (0.3%)                   |
+|                            | Fragmented BUSCOs (F)                | 5 (0.2%)                   |
+|                            | Missing BUSCOs (M)                   | 4 (0.1%)                   |
+|                            | Total BUSCO groups searched (n)      | 3285                       |
+|                            | BUSCO groups with internal stops     | 64                         |
+| **Assembly Statistics**    | Number of scaffolds                  | 2442                       |
+|                            | Number of contigs                    | 2442                       |
+|                            | Total length                         | 142,573,024 bp             |
+|                            | Percent gaps                         | 0.000%                     |
+|                            | Scaffold N50                         | 21 MB                      |
+|                            | Contigs N50                          | 21 MB                      |
 

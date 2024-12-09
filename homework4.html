@@ -393,6 +393,8 @@ bioawk -c fastx &#39;{ print $name, length($seq), gc($seq) }&#39; filtered_100kb
 <pre class="r"><code>library(ggplot2)
 
 # Load sequence length data for sequences ≤ 100kb
+setwd(&quot;~/remote_mount/myrepos/ee282/data/raw&quot;)
+
 sequence_lengths_100kb&lt;- read.table(&quot;sorted_lengths_100kb.txt&quot;, header = FALSE, sep = &quot;\t&quot;)
 
 # Add column names manually
@@ -435,6 +437,7 @@ ggplot(data = sequence_lengths_100kb_plus, aes(x = GC_Content)) +
 <pre class="bash"><code># plot cumulative sequence size sorted from largest to smallest sequences
 cut -f2 sorted_lengths_100kb.txt &gt; sorted_lengths_copy_100kb.txt
 plotCDF sorted_lengths_copy_100kb.txt cdf_100kb.png
+![Cumulative Distribution Function](https://raw.githubusercontent.com/ValentinaP-NYC/ee282/homework4/cdf_100kb.png)
 
 cut -f2 sorted_lengths_100kb_plus.txt &gt; sorted_lengths_copy_100kb_plus.txt
 plotCDF sorted_lengths_copy_100kb_plus.txt cdf_100kb_plus.png</code></pre>
@@ -522,169 +525,179 @@ hifiasm -o /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.4
 
 awk &#39;/^S/{print &quot;&gt;&quot;$2;print $3}&#39; /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.gfa &gt; /data/homezvol2/valenp1//myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa
 </code></pre>
+</div>
+</div>
+<div id="busco-results-summary-for-iso1" class="section level1">
+<h1>BUSCO Results Summary for ISO1</h1>
 <pre class="bash"><code># run busco, the sbatch script can be found at ee282/code/scripts
-
-busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa -o ISO1_Hifiasm --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/busco
-</code></pre>
-</div>
-</div>
-<div id="busco-results-summary" class="section level1">
-<h1>BUSCO Results Summary</h1>
-<div id="overview" class="section level3">
-<h3>Overview</h3>
-<table>
-<thead>
-<tr class="header">
-<th>Statistic</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>BUSCO version</strong></td>
-<td>5.8.1</td>
-</tr>
-<tr class="even">
-<td><strong>Lineage dataset</strong></td>
-<td>diptera_odb10</td>
-</tr>
-<tr class="odd">
-<td><strong>Number of BUSCOs searched</strong></td>
-<td>3285</td>
-</tr>
-<tr class="even">
-<td><strong>Gene predictor used</strong></td>
-<td>miniprot</td>
-</tr>
-<tr class="odd">
-<td><strong>Mode</strong></td>
-<td>euk_genome_min</td>
-</tr>
-<tr class="even">
-<td><strong>Percent complete (C)</strong></td>
-<td>99.6%</td>
-</tr>
-<tr class="odd">
-<td><strong>Percent single-copy (S)</strong></td>
-<td>99.4%</td>
-</tr>
-<tr class="even">
-<td><strong>Percent duplicated (D)</strong></td>
-<td>0.2%</td>
-</tr>
-<tr class="odd">
-<td><strong>Percent fragmented (F)</strong></td>
-<td>0.2%</td>
-</tr>
-<tr class="even">
-<td><strong>Percent missing (M)</strong></td>
-<td>0.2%</td>
-</tr>
-<tr class="odd">
-<td><strong>Errors</strong></td>
-<td>2.0%</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="busco-breakdown" class="section level3">
-<h3>BUSCO Breakdown</h3>
+busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa -o ISO1_Hifiasm --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/busco</code></pre>
 <table>
 <colgroup>
-<col width="41%" />
-<col width="20%" />
-<col width="38%" />
+<col width="29%" />
+<col width="40%" />
+<col width="30%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th>Category</th>
-<th>Count</th>
-<th>Details</th>
+<th><strong>Category</strong></th>
+<th><strong>Metric</strong></th>
+<th><strong>Value</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Complete BUSCOs (C)</strong></td>
-<td>3272</td>
-<td>Of which 66 contain internal stop codons</td>
+<td><strong>Results Summary</strong></td>
+<td>Complete BUSCOs (C)</td>
+<td>3272 (99.6%)</td>
 </tr>
 <tr class="even">
-<td><strong>Complete and single-copy BUSCOs (S)</strong></td>
-<td>3265</td>
 <td></td>
+<td>├── Single-copy BUSCOs (S)</td>
+<td>3265 (99.4%)</td>
 </tr>
 <tr class="odd">
-<td><strong>Complete and duplicated BUSCOs (D)</strong></td>
-<td>7</td>
 <td></td>
+<td>└── Duplicated BUSCOs (D)</td>
+<td>7 (0.2%)</td>
 </tr>
 <tr class="even">
-<td><strong>Fragmented BUSCOs (F)</strong></td>
-<td>5</td>
 <td></td>
+<td>Fragmented BUSCOs (F)</td>
+<td>5 (0.2%)</td>
 </tr>
 <tr class="odd">
-<td><strong>Missing BUSCOs (M)</strong></td>
-<td>8</td>
 <td></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="assembly-statistics" class="section level3">
-<h3>Assembly Statistics</h3>
-<table>
-<thead>
-<tr class="header">
-<th>Statistic</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Number of scaffolds</strong></td>
-<td>148</td>
+<td>Missing BUSCOs (M)</td>
+<td>8 (0.2%)</td>
 </tr>
 <tr class="even">
-<td><strong>Number of contigs</strong></td>
+<td></td>
+<td>Total BUSCO groups searched (n)</td>
+<td>3285</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>BUSCO groups with internal stops</td>
+<td>66</td>
+</tr>
+<tr class="even">
+<td><strong>Assembly Statistics</strong></td>
+<td>Number of scaffolds</td>
 <td>148</td>
 </tr>
 <tr class="odd">
-<td><strong>Total length</strong></td>
-<td>159,127,788</td>
+<td></td>
+<td>Number of contigs</td>
+<td>148</td>
 </tr>
 <tr class="even">
-<td><strong>Percent gaps</strong></td>
+<td></td>
+<td>Total length</td>
+<td>159,127,788 bp</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Percent gaps</td>
 <td>0.000%</td>
 </tr>
-<tr class="odd">
-<td><strong>Scaffold N50</strong></td>
+<tr class="even">
+<td></td>
+<td>Scaffold N50</td>
 <td>21 MB</td>
 </tr>
-<tr class="even">
-<td><strong>Contig N50</strong></td>
+<tr class="odd">
+<td></td>
+<td>Contigs N50</td>
 <td>21 MB</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="dependencies-and-versions" class="section level3">
-<h3>Dependencies and Versions</h3>
+<div id="busco-results-summary-for-release-6-dmel-contig" class="section level1">
+<h1>BUSCO Results Summary for Release 6 Dmel contig</h1>
+<pre class="bash"><code># run busco, the sbatch script can be found at ee282/code/scripts
+busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa -o dmel.r6_ctg --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/hmw4_busco</code></pre>
 <table>
+<colgroup>
+<col width="29%" />
+<col width="40%" />
+<col width="30%" />
+</colgroup>
 <thead>
 <tr class="header">
-<th>Dependency</th>
-<th>Version</th>
+<th><strong>Category</strong></th>
+<th><strong>Metric</strong></th>
+<th><strong>Value</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>hmmsearch</strong></td>
-<td>3.4</td>
+<td><strong>Results Summary</strong></td>
+<td>Complete BUSCOs (C)</td>
+<td>3276 (99.7%)</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>├── Single-copy BUSCOs (S)</td>
+<td>3267 (99.5%)</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>└── Duplicated BUSCOs (D)</td>
+<td>9 (0.3%)</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Fragmented BUSCOs (F)</td>
+<td>5 (0.2%)</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Missing BUSCOs (M)</td>
+<td>4 (0.1%)</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Total BUSCO groups searched (n)</td>
+<td>3285</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>BUSCO groups with internal stops</td>
+<td>64</td>
+</tr>
+<tr class="even">
+<td><strong>Assembly Statistics</strong></td>
+<td>Number of scaffolds</td>
+<td>2442</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Number of contigs</td>
+<td>2442</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Total length</td>
+<td>142,573,024 bp</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Percent gaps</td>
+<td>0.000%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Scaffold N50</td>
+<td>21 MB</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Contigs N50</td>
+<td>21 MB</td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 
 

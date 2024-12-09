@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Specify the job name
-#SBATCH --job-name=hw4_busco_ISO1_job
+#SBATCH --job-name=hw4_busco_dmel.r6_job
 
 ## account to charge
 #SBATCH -A CLASS_EE282
@@ -14,8 +14,8 @@
 #SBATCH -p standard
 
 # Specify where standard output and error are stored
-#SBATCH --error=hw4_busco_ISO1_job.err
-#SBATCH --output=hw4_busco_ISO1_job.out
+#SBATCH --error=hw4_busco_dmel.r6_job.err
+#SBATCH --output=hw4_busco_dmel.r6_job.out
 
 ## Pass the current environment variables
 #SBATCH --export=ALL
@@ -41,8 +41,8 @@ mamba activate busco
 # busco --list-datasets
 # use diptera_odb10
 
-busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa -o ISO1_Hifiasm --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/busco
+#busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.fa -o ISO1_Hifiasm --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/busco
 
-
+busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-all-chromosome-r6.48.ctg.fa -o dmel.r6_ctg --lineage diptera_odb10 --out_path /data/homezvol2/valenp1/myrepos/ee282/data/processed/hmw4_busco
 
 
