@@ -241,3 +241,5 @@ busco -f -c 32 -m genome -i /data/homezvol2/valenp1/myrepos/ee282/data/raw/dmel-
 |                            | Scaffold N50                         | 21 MB                      |
 |                            | Contigs N50                          | 21 MB                      |
 
+## d-genies file available at ee282/map_dmel-all-chromosome-r6.48.ctg_to_ISO1_Hifi_AdaptorRem.40X.asm.bp.p_ctg.png
+
