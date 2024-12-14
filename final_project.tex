@@ -218,9 +218,13 @@ species-specific assemblies. Each assembly incorporated pooled RNA-seq
 data across experimental conditions to maximize transcript diversity.
 Trinity performed \emph{in silico normalization} of reads to reduce
 systematic coverage and improve assembly performance. Batch jobs were
-submitted using custom scripts located at \emph{code/scripts}. Prefixes
-`pc' and `xm' were used throughout the final project directory to
-distinguish sub-directories and files for P.chirus and X.mucosus,
+submitted using custom scripts located at \emph{code/scripts}. The
+script TrinityStats.pl was utilized to summarize basic metrics for the
+P.chirus and X.mucosus \emph{de novo} assemblies which can be found in
+\emph{output/reports}.
+
+Prefixes `pc' and `xm' were used throughout the final project directory
+to distinguish sub-directories and files for P.chirus and X.mucosus,
 respectively. For example, Trinity outputs for P. chirus and X.mucosus
 are found in \emph{data/processed/pc\_trinity\_out.Trinity.fasta.gz}
 \emph{data/processed/xm\_trinity\_out.Trinity.fasta.gz}.
@@ -537,7 +541,7 @@ for RNA-seq: accounting for selection bias. Genome Biol. 11, R14 (2010).
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{output/figures/pc_and_xm_TMM_EXPR.minRow10.log2.centered.prcomp.extreme50.PC2.components.png}
-\caption{Subset heatmap for 50 extreme transcripts driving variation along the second axis of variation PC 2 for P.chiurs. }
+\caption{Subset heatmap for 50 extreme transcripts driving variation along the second axis of variation PC 2 for P.chiurs.}
 \end{figure}
 
 

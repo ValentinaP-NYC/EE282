@@ -48,7 +48,9 @@ Quality reports for the raw read data were generated for each sample using FastQ
 *output/reports/fastp* and *data/processed/trimmed_out*, respectively.
 
 ## De novo transcriptome assembly and annotation
-Following the approach of Herrera et al. (2022), transcriptome assemblies were conducted using Trinity v2.15.2 [5]. RNA-seq data for X.mucosus and P.chirus were processed separately to produce species-specific assemblies. Each assembly incorporated pooled RNA-seq data across experimental conditions to maximize transcript diversity. Trinity performed *in silico normalization* of reads to reduce systematic coverage and improve assembly performance. Batch jobs were submitted using custom scripts located at *code/scripts*. Prefixes 'pc' and 'xm' were used throughout the final project directory to distinguish sub-directories and files for P.chirus and X.mucosus, respectively. For example, Trinity outputs for P. chirus and X.mucosus are found in *data/processed/pc_trinity_out.Trinity.fasta.gz* *data/processed/xm_trinity_out.Trinity.fasta.gz*.
+Following the approach of Herrera et al. (2022), transcriptome assemblies were conducted using Trinity v2.15.2 [5]. RNA-seq data for X.mucosus and P.chirus were processed separately to produce species-specific assemblies. Each assembly incorporated pooled RNA-seq data across experimental conditions to maximize transcript diversity. Trinity performed *in silico normalization* of reads to reduce systematic coverage and improve assembly performance. Batch jobs were submitted using custom scripts located at *code/scripts*. The script TrinityStats.pl was utilized to summarize basic metrics for the P.chirus and X.mucosus *de novo* assemblies which can be found in *output/reports*.
+
+Prefixes 'pc' and 'xm' were used throughout the final project directory to distinguish sub-directories and files for P.chirus and X.mucosus, respectively. For example, Trinity outputs for P. chirus and X.mucosus are found in *data/processed/pc_trinity_out.Trinity.fasta.gz* *data/processed/xm_trinity_out.Trinity.fasta.gz*.
 
 Transcriptome annotation was performed using Trinotate v4.0.2 [6]. Open reading frames (ORFs) were identified using TransDecoder v2.0.1 [7], and translated ORFs were aligned against the Swiss-Prot database using BLASTX. The best hits were annotated with Gene Ontology (GO) terms. Protein domains were identified with HMMER v3.1 and hmmscan against the Pfam-A database. Individual Trinotate reports were generated for each species and are located at *output/reports/pc_debugged_trinotate.xls* and *output/reports/xm_Trinotate.sqlite/xm_debugged_trinotate.xls*.
 
@@ -73,7 +75,7 @@ In X.mucosus, 37.61% of the total variance is explained by the first principal c
 \end{figure}
 
 ## Transcriptome assembly and annotation
-Transcripts were subjected to annotation analysis by comparing with Nr, Nt, Pfam, Swiss-Prot, KEGG and GO databases. Trinotate result summary shows approximately 38% of unique genes in P.chirus and 43% of unique genes in X.mucosus were assigned Pfam IDs during annotation. Annotation revealed 6,172 Pfam domains in P. chirus and 5,369 in X. mucosus for unique genes Table 1). For total genes, P.chirus had 65,691 Pfam IDs, while X. mucosus had 55,925. 
+Transcripts were subjected to annotation analysis by comparing with Nr, Nt, Pfam, Swiss-Prot, KEGG and GO databases. Trinotate result summary shows approximately 38% of unique genes in P.chirus and 43% of unique genes in X.mucosus were assigned Pfam IDs during annotation. Annotation revealed 6,172 Pfam domains in P. chirus and 5,369 in X. mucosus for unique genes Table 1). For total genes, P.chirus had 65,691 Pfam IDs, while X. mucosus had 55,925.
 
 | Species           | P.chirus   (Unique) | P.chirus   (Total)    | X.mucosus     (Unique) | X.mucosus    (Total) |
 |-------------------|-----------------------------|-----------------------------------|-----------------------------|-----------------------------------|
