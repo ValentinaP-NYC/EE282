@@ -1,0 +1,1 @@
+Trinotate reports for P.chirus and X.mucosus were copied from /pub/valenp1/data/processed/trinotate
