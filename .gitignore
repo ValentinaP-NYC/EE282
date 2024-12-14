@@ -1,3 +1,5 @@
+## excel trinotate files
+*.xls
 ## C files
 
 # Prerequisites
@@ -477,7 +479,8 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
